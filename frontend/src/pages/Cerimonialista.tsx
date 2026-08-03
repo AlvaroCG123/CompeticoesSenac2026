@@ -1,0 +1,103 @@
+import React, { useEffect, useState } from "react"
+import api from "../service/api"
+import { useNavigate } from "react-router-dom"
+
+interface ConvidadoDados {
+    id: number,
+    nome_completo: string,
+    mesaId: number,
+    check_in: boolean
+}
+
+const Cerimonialista = () => {
+
+    const [convidado, setConvidado] = useState<ConvidadoDados[]>([])
+
+    const navigate = useNavigate()
+
+    async function ListaConvidados() {
+        const token = localStorage.getItem("@Wedding: token")
+        const respostaApi = await api.get("/convidado/listar", { headers: { Authorization: `Bearer ${token}` } })
+
+        setConvidado(respostaApi.data)
+
+        console.log(respostaApi.data)
+    }
+
+    async function Pesquisa(nome_completo: string) {
+        const token = localStorage.getItem("@Wedding: token")
+        const respostaApi = await api.get(`/convidado/pesquisa?nome_completo=${nome_completo}`, { headers: { Authorization: `Bearer ${token}` } })
+
+        setConvidado(respostaApi.data)
+
+        console.log(respostaApi.data)
+    }
+
+    function HandleMudancaInput(evento: React.ChangeEvent<HTMLInputElement>){
+        const valorDigitado = evento.target.value
+        if(valorDigitado === ''){
+            ListaConvidados()
+        }else{
+            Pesquisa(valorDigitado)
+        }
+    }
+
+    async function Checkin(id: number) {
+        try {
+            const confirmar = window.confirm("Voce tem certeza?")
+            if (!confirmar) return
+            const token = localStorage.getItem("@Wedding: token")
+            await api.patch(`/convidado/checkin/${id}`, null, { headers: { Authorization: `Bearer ${token}` } })
+            console.log(token)
+            
+
+            ListaConvidados()
+        } catch (error) {
+            console.error("falha: ", error)
+
+        }
+    }
+
+    async function Sair() {
+        const confirmar = window.confirm("Voce tem certeza?")
+            if (!confirmar) return
+        localStorage.removeItem("@Wedding: token")
+        navigate("/")
+    }
+
+    async function Exportar() {
+        window.print()
+    }
+
+    useEffect(() => {
+        ListaConvidados()
+    }, [])
+
+    return (
+        <main className="min-h-screen bg-amber-100 flex flex-col items-center">
+            <nav className="p-7 flex justify-center flex-col">
+                <h1 className="text-3xl font-light cinzel text-[#007C18]">Convidados</h1> <button onClick={() => Sair()} className="text-sm bg-[#E2725B] py-2 mt-5 rounded-md cursor-pointer px-5 text-amber-50">SAIR</button>
+                <button onClick={() => Exportar()} className="text-sm bg-[#E2725B] py-2 mt-5 rounded-md cursor-pointer px-5 text-amber-50">EXPORTAR</button>
+                <input type="text" onChange={HandleMudancaInput} className="bg-white p-2 mt-3 rounded-md" placeholder="Pesquise aqui..." />
+            </nav>
+            <div className=" lg: max-w-100">
+            {convidado.map(c => (
+                <div key={c.id} className="bg-amber-50 flex flex-col p-4 rounded-2xl my-5 mx-5">
+                    <h1 className="text-3xl">{c.nome_completo}</h1>
+                    <div className="flex justify-between">
+                        <h2 className="text-2xl">Mesa: {c.mesaId}</h2>
+                        <h2>(1/6)</h2>
+                    </div>
+                    <h1>{c.check_in ? 'CONFIRMADO' : 'PENDENTE'}</h1>
+                    <button onClick={() => Checkin(c.id)} disabled={c.check_in} className={`py-3 m-2 rounded-2xl text-amber-50 ${
+                        c.check_in
+                        ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#e2725B] cursor-pointer'
+                    }`}>Checkin</button>
+                </div>
+            ))}
+            </div>
+        </main>
+    )
+}
+
+export default Cerimonialista

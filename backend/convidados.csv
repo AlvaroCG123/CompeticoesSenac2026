@@ -1,0 +1,37 @@
+id,nome_completo,email,telefone,mesa,check_in,horario_checkin
+1,Celso Bastos,celso.bastos@gmail.com,(54) 99134-5678,1,1,2026-06-20 19:05:00
+2,Marina Bastos,marina.bastos@gmail.com,(54) 99134-5679,1,1,2026-06-20 19:07:00
+3,Fernando Bastos,fernando.bastos@gmail.com,(54) 99134-5680,1,1,2026-06-20 19:12:00
+4,Antônio Bastos,antonio.bastos@gmail.com,(54) 99234-1122,1,1,2026-06-20 19:15:00
+5,Sônia Bastos,sonia.bastos@gmail.com,(54) 99234-1123,1,1,2026-06-20 19:18:00
+6,Carlos Henrique Lima,carloslima@gmail.com,(54) 98765-4321,1,1,2026-06-20 19:20:00
+7,Cláudio Bastos,claudio.bastos@gmail.com,(51) 99876-1234,2,1,2026-06-20 19:25:00
+8,Regina Bastos,regina.bastos@gmail.com,(51) 99876-1235,2,1,2026-06-20 19:28:00
+9,Bernardo Bastos,bernardo.bastos@gmail.com,(11) 97654-3210,2,1,2026-06-20 19:30:00
+10,Bárbara Bastos,barbara.bastos@gmail.com,(54) 99111-2233,2,1,2026-06-20 19:35:00
+11,Marcelo Junqueira,marcelo.junqueira@gmail.com,(54) 99111-2234,2,0,
+12,Mariana Bastos,mariana.bastos@gmail.com,(54) 99111-2235,2,0,
+13,Vitor Bastos,vitor.bastos@gmail.com,(54) 99111-2236,3,0,
+14,Ana Luiza Ferreira,analuiza.ferreira@gmail.com,(51) 99345-6789,3,0,
+15,Pedro Henrique Martins,pedrohenrique.martins@gmail.com,(51) 99345-6790,3,0,
+16,Isabela Costa,isabela.costa@gmail.com,(51) 98765-1234,3,0,
+17,Lucas Mendes,lucas.mendes@gmail.com,(51) 99234-5678,3,0,
+18,Juliana Alves,juliana.alves@gmail.com,(51) 99234-5679,3,0,
+19,Takeshi Nakao,takeshi.nakao@outlook.com,+81 90-1234-5678,4,1,2026-06-20 19:22:00
+20,Rina Nakao,rina.nakao@outlook.com,+81 90-1234-5679,4,1,2026-06-20 19:24:00
+21,Daniel Suzuki,daniel.suzuki@gmail.com,+1 (415) 555-0123,4,1,2026-06-20 19:40:00
+22,Erika Suzuki,erika.suzuki@gmail.com,+1 (415) 555-0124,4,0,
+23,Yuki Tanaka,yuki.tanaka@outlook.com,+81 90-8765-4321,4,0,
+24,Kenji Yamamoto,kenji.yamamoto@outlook.com,+81 90-8765-4322,4,0,
+25,Mattew Stuart,mattew.stuart@gmail.com,+44 7700 900123,5,1,2026-06-20 19:10:00
+26,Olivia Thompson,olivia.thompson@gmail.com,+44 7700 900124,5,1,2026-06-20 19:11:00
+27,Ravi Desai,ravi.desai@gmail.com,+91 98765 43210,5,1,2026-06-20 19:13:00
+28,Charlotte Harper,charlotte.harper@gmail.com,+44 7700 900125,5,1,2026-06-20 19:32:00
+29,Mia Taylor,mia.taylor@gmail.com,+44 7700 900126,5,1,2026-06-20 19:45:00
+30,Michael Brown,michael.brown@gmail.com,+44 7700 900127,5,0,
+31,Beatriz Santos,beatriz.santos@gmail.com,(51) 99567-8901,6,0,
+32,Gabriel Oliveira,gabriel.oliveira@gmail.com,(51) 99567-8902,6,0,
+33,Fernanda Rocha,fernanda.rocha@gmail.com,(51) 99567-8903,6,0,
+34,Rafael Sousa,rafael.sousa@gmail.com,(51) 99567-8904,6,0,
+35,Camila Pereira,camila.pereira@gmail.com,(51) 99567-8905,6,0,
+36,Thiago Rodrigues,thiago.rodrigues@gmail.com,(51) 99567-8906,6,0,
