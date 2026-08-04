@@ -34,7 +34,26 @@ export async function CriarConvidado(req: Request, res: Response) {
             res.status(400).json({ mensagem:"Todos os dados sao obrigatórios."})
             return
         }
-        
+
+        const mesa = await prisma.mesa.findUnique({
+  where: {
+    id: mesaId,
+  },
+  include: {
+    _count: {
+      select: { convidado: true }, // Conta os registros na relação 'convidado'
+    },
+  },
+});
+
+if (!mesa) {
+  throw new Error("Mesa não encontrada.");
+}
+
+// Verifica se a quantidade atual de convidados atingiu ou passou da capacidade
+if (mesa._count.convidado >= mesa.capacidade) {
+  throw new Error("A capacidade máxima desta mesa já foi atingida.");
+}
         const criar = await prisma.convidado.create({
             data: {
                 nome_completo, email, mesaId , telefone
@@ -114,8 +133,8 @@ export async function desfazerCheckin(req: Request, res: Response) {
         const { id } = req.params
 
         if(!id){
-            res.status(404).json({error: "ID Inválido."})
-            return
+            throw res.status(404).json({error: "ID Inválido."})
+            
         }
 
         const convidado = await prisma.convidado.findUnique({

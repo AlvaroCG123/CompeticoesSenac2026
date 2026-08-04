@@ -150,7 +150,7 @@ const Dashboard = () => {
             CancelarEdicao()
         } catch (error) {
             console.error("Erro: ", error)
-            alert("erro ao criar convidado")
+            alert("erro ao criar convidado ou mesa cheia") 
         }
 
     }
