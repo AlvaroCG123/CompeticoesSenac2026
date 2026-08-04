@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import { jsPDF } from "jspdf"
+import autoTable from "jspdf-autotable"
 import api from "../service/api"
 import { useForm } from "react-hook-form"
 import { CircleCheckBig, CircleX, Pencil, Trash2 } from "lucide-react"
@@ -33,8 +35,41 @@ const Dashboard = () => {
     const [convidado, setConvidado] = useState<ConvidadoDados[]>([])
     const [dados, setDados] = useState<Dados>({ total: 0, confirmados: 0, pendentes: 0 })
     const [idEditando, setIdEditando] = useState<number | null>(null)
+    const [OrdemMesa, setOrdemMesa] = useState<'padrão' | 'crescente' | 'decrescente'>('padrão')
 
     const navigate = useNavigate()
+
+    function GerarPdf() {
+        try {
+            const doc = new jsPDF()
+            doc.setFontSize(16)
+            doc.text("Relatório de convidados - Casamento", 14, 15)
+            doc.setFontSize(12)
+            doc.text(`Total: ${dados.total} | Confirmados: ${dados.confirmados} | Pendentes: ${dados.pendentes}`, 14, 25)
+
+            const colunas = ["Nome", "Email", "Mesa", "Status"]
+
+            const linhas = convidado.map(c => [
+                c.nome_completo,
+                c.email,
+                c.mesaId,
+                c.check_in ? "CONFIRMADO" : "PENDENTE"
+            ])
+
+            autoTable(doc, {
+                head: [colunas],
+                body: linhas,
+                startY: 35,
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [0, 124, 24] }
+
+            })
+            doc.save("lista_convidados.pdf")
+        } catch (error) {
+            alert("Erro ao gerar PDF")
+        }
+    }
+
 
     async function Estatisticas() {
         try {
@@ -51,7 +86,7 @@ const Dashboard = () => {
     async function DesfazerCheckin(id: number) {
         try {
             const token = localStorage.getItem("@Wedding: token")
-            await api.patch(`/convidado/desfazercheckin/${id}`,null, { headers: { Authorization: `Bearer ${token}` } })
+            await api.patch(`/convidado/desfazercheckin/${id}`, null, { headers: { Authorization: `Bearer ${token}` } })
             const confirmar = window.confirm("Voce tem certeza?")
             if (!confirmar) return
 
@@ -75,12 +110,12 @@ const Dashboard = () => {
             console.error("falha: ", error)
         }
     }
-    
+
     async function Checkin(id: number) {
         try {
             const token = localStorage.getItem("@Wedding: token")
             await api.patch(`/convidado/checkin/${id}`, null, { headers: { Authorization: `Bearer ${token}` } })
-     
+
             const confirmar = window.confirm("Voce tem certeza?")
             if (!confirmar) return
 
@@ -96,14 +131,14 @@ const Dashboard = () => {
             const token = localStorage.getItem("@Wedding: token")
             const headers = { headers: { Authorization: `Bearer ${token}` } }
 
-            if(idEditando){
+            if (idEditando) {
                 await api.put(`/convidado/atualizar/${idEditando}`, dados, headers)
                 alert("Convidado Atualizado com sucesso")
-            }else{
-                const respostaAPi = await api.post("/convidado/criar", dados, headers )
-    
+            } else {
+                const respostaAPi = await api.post("/convidado/criar", dados, headers)
+
                 console.log(respostaAPi.data)
-    
+
                 Estatisticas()
                 ListarConvidados()
                 reset()
@@ -120,12 +155,12 @@ const Dashboard = () => {
 
     }
 
-    function PreencherFormulario(convidadoSelecionado: ConvidadoDados){
+    function PreencherFormulario(convidadoSelecionado: ConvidadoDados) {
         setIdEditando(convidadoSelecionado.id)
         setValue("nome_completo", convidadoSelecionado.nome_completo)
         setValue("email", convidadoSelecionado.email)
         setValue("mesaId", convidadoSelecionado.mesaId)
-        if(convidadoSelecionado.telefone){
+        if (convidadoSelecionado.telefone) {
             setValue("telefone", convidadoSelecionado.telefone)
         }
     }
@@ -148,13 +183,9 @@ const Dashboard = () => {
         }
     }
 
-    async function Exportar() {
-        window.print()
-    }
-
     async function Sair() {
         const confirmar = window.confirm("Voce tem certeza?")
-            if (!confirmar) return
+        if (!confirmar) return
         localStorage.removeItem("@Wedding: token")
         navigate("/")
     }
@@ -165,12 +196,18 @@ const Dashboard = () => {
             ListarConvidados()
     }, [])
 
+    const convidadosOrdenados = [...convidado].sort((a, b) => {
+        if (OrdemMesa === 'crescente') return a.mesaId - b.mesaId
+        if (OrdemMesa === 'decrescente') return b.mesaId - a.mesaId
+        return 0
+    })
+
     return (
         <main className="bg-amber-100 min-h-screen">
             <nav className="p-5">
                 <h1 className="text-6xl font-light cinzel text-[#007C18]">DASHBOARD: ADMIN</h1>
                 <button onClick={() => Sair()} className="fixed right-40 top-0 bg-[#E2725B] py-3 mt-5 rounded-2xl cursor-pointer px-5 text-amber-50">Sair</button>
-                <button onClick={() => Exportar()} className="fixed right-5 top-0 bg-[#E2725B] py-3 mt-5 rounded-2xl cursor-pointer px-5 text-amber-50">EXPORTAR</button>
+                <button onClick={() => GerarPdf()} className="fixed right-5 top-0 bg-[#E2725B] py-3 mt-5 rounded-2xl cursor-pointer px-5 text-amber-50">EXPORTAR</button>
                 <hr />
             </nav>
             <section className=" flex justify-center gap-10">
@@ -222,18 +259,24 @@ const Dashboard = () => {
                                 <tr>
                                     <th className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Nome</th>
                                     <th className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Dados</th>
-                                    <th className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Mesa</th>
+                                    <th onClick={()=>{
+                                        if(OrdemMesa === 'padrão') setOrdemMesa('crescente')
+                                            else if(OrdemMesa === 'crescente') setOrdemMesa('decrescente')
+                                        else setOrdemMesa('padrão')
+                                    }}
+                                    title="CLieque para ordenar o menu"
+                                    className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Mesa {OrdemMesa === 'crescente' ? '↑' : OrdemMesa === 'decrescente' ? '↓' : '↕' }</th>
                                     <th className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Status</th>
                                     <th className="border-gray-800 p-3 bg-[#007C18] text-white px-8">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {convidado.map(c => (
+                                {convidadosOrdenados.map(c => (
                                     <tr key={c.id}>
                                         <td className="border p-3 bg-white">{c.nome_completo}</td>
                                         <td className="border p-3 bg-white">{c.email}</td>
                                         <td className="border p-3 bg-white">{c.mesaId}</td>
-                                        <td className="border p-3 bg-white">{c.check_in ? 'CONFIRMADO' : 'PENDENTE'}</td>
+                                        <td className={`border p-3 bg-white ${c.check_in ? `text-green-800` : `text-red-500`}`}>{c.check_in ? 'CONFIRMADO' : 'PENDENTE'}</td>
                                         <td className="border p-3 bg-white">
                                             <div className="flex gap-2 justify-center">
                                                 <Pencil onClick={() => PreencherFormulario(c)} className="cursor-pointer" />
